@@ -21,14 +21,23 @@ function isShort(nick) {
 function generateOne(words) {
   let base = words.join("");
 
+  let shuffled = [...words].sort(() => Math.random() - 0.5).join("");
+
   let variants = [
     base,
+    base.toLowerCase(),
+    base.toUpperCase(),
+
     pick(prefixes) + base,
     base + pick(suffixes),
+
     "x" + base + "x",
-    words.sort(() => Math.random() - 0.5).join(""),
-    words.join(pick(separators)),
-    pick(prefixes) + words[0] + words.at(-1),
+
+    words[0] + pick(separators) + words.at(-1),
+
+    shuffled,
+
+    pick(prefixes) + words[0] + words.at(-1) + pick(suffixes)
   ];
 
   return pick(variants);
@@ -48,8 +57,11 @@ function generate() {
   let onlyShort = document.getElementById("shortOnly")?.checked;
 
   let result = [];
+  let attempts = 0;
 
-  while (result.length < 20) {
+  while (result.length < 20 && attempts < 200) {
+    attempts++;
+
     let nick = generateOne(words);
 
     if (onlyShort && !isShort(nick)) continue;
@@ -61,4 +73,12 @@ function generate() {
 
   document.getElementById("result").innerHTML =
     result.map(n => `${n} — ${rarity(n)}`).join("<br>");
+}
+
+function copyNick() {
+  if (!lastNicks.length) return;
+
+  navigator.clipboard.writeText(lastNicks[0]);
+
+  document.getElementById("result").innerText = "copied!";
 }
