@@ -1,5 +1,3 @@
-let lastNicks = [];
-
 const prefixes = ["x", "xx", "i", "pro", "real", "dark", "neo", "ultra"];
 const suffixes = ["x", "z", "yt", "pro", "gaming", "hd", "mc", "lol"];
 const separators = ["", "_", ".", "-"];
@@ -14,30 +12,17 @@ function rarity(nick) {
   return "COMMON";
 }
 
-function isShort(nick) {
-  return nick.length <= 8;
-}
-
 function generateOne(words) {
   let base = words.join("");
-
   let shuffled = [...words].sort(() => Math.random() - 0.5).join("");
 
   let variants = [
     base,
-    base.toLowerCase(),
-    base.toUpperCase(),
-
     pick(prefixes) + base,
     base + pick(suffixes),
-
     "x" + base + "x",
-
     words[0] + pick(separators) + words.at(-1),
-
-    shuffled,
-
-    pick(prefixes) + words[0] + words.at(-1) + pick(suffixes)
+    shuffled
   ];
 
   return pick(variants);
@@ -59,26 +44,16 @@ function generate() {
   let result = [];
   let attempts = 0;
 
-  while (result.length < 20 && attempts < 200) {
+  while (result.length < 5 && attempts < 100) {
     attempts++;
 
     let nick = generateOne(words);
 
-    if (onlyShort && !isShort(nick)) continue;
+    if (onlyShort && nick.length > 8) continue;
 
     result.push(nick);
   }
 
-  lastNicks = result;
-
   document.getElementById("result").innerHTML =
     result.map(n => `${n} — ${rarity(n)}`).join("<br>");
-}
-
-function copyNick() {
-  if (!lastNicks.length) return;
-
-  navigator.clipboard.writeText(lastNicks[0]);
-
-  document.getElementById("result").innerText = "copied!";
 }
